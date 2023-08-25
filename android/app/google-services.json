@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "123877531662",
+    "project_id": "sajiloyatra-d0a1c",
+    "storage_bucket": "sajiloyatra-d0a1c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123877531662:android:c27ed84c0e7f9f8056dc5f",
+        "android_client_info": {
+          "package_name": "com.example.sajilo_yatra"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "123877531662-ghk7pauidt79m8s6ptb5ef6fiaug8b46.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAltolMjrh-Gy3KYpiHmhl5iz50dxdjOZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "123877531662-ghk7pauidt79m8s6ptb5ef6fiaug8b46.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

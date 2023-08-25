@@ -1,0 +1,254 @@
+// ignore_for_file: unnecessary_new
+
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:sajilo_yatra/vehicle_owners/vehicleownerhome.dart';
+
+class VLocation extends StatefulWidget {
+  final String going;
+  final String leaving;
+  final String location;
+  const VLocation({
+    Key? key,
+    required this.going,
+    required this.leaving,
+    required this.location,
+  }) : super(key: key);
+
+  @override
+  State<VLocation> createState() => _VLocationState();
+}
+
+class _VLocationState extends State<VLocation> {
+  TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _textEditingController1 = TextEditingController();
+  TextEditingController _goingController = TextEditingController();
+  TextEditingController _leavingController = TextEditingController();
+  List<String> _places = [];
+
+  Future<void> searchPlacesInNepal() async {
+    final query = _textEditingController.text;
+    final url =
+        'https://api.mapbox.com/geocoding/v5/mapbox.places/$query.json?country=np&access_token=pk.eyJ1IjoiZGdkb24tMTIzIiwiYSI6ImNsZjF2NG5lbTBjYXEzem52aGo0ZTF6aHUifQ.DEvWGUYA_ELjd4mZV8MbcA';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      final data = jsonDecode(response.body);
+
+      final features = data['features'] as List<dynamic>;
+      final places = <String>[];
+      for (final feature in features) {
+        final placeName = feature['place_name'] as String;
+        places.add(placeName);
+      }
+
+      setState(() => _places = places);
+    } catch (e) {
+      print('Failed to get search results from Mapbox: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _goingController = TextEditingController(text: widget.going);
+    _leavingController = TextEditingController(text: widget.leaving);
+    _textEditingController = TextEditingController(text: widget.location);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFFFFF),
+      appBar: AppBar(
+        elevation: 0,
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Color(0xFFFFFFFF),
+                size: 25,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            );
+          },
+        ),
+        backgroundColor: const Color(0xFF0062DE),
+        title: const Text('Search',
+            style: TextStyle(
+              color: Color(0xFFFFFFFF),
+              fontFamily: 'Roboto Bold',
+              fontSize: 22,
+              height: 1.19,
+              fontWeight: FontWeight.w500,
+            )),
+      ),
+      body: Container(
+        child: Column(
+          children: [
+            Container(
+              height: 140.4,
+              width: 399,
+              color: const Color(0xFF0062DE),
+              child: Column(
+                children: [
+                  Container(
+                    height: 1.h,
+                  ),
+                  new Row(
+                    children: [
+                      Container(
+                        width: 5.8.w,
+                      ),
+                      const Text(
+                        "Meeting Location",
+                        style: TextStyle(
+                          fontFamily: "Mulish",
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFFFFFFF),
+                          fontSize: 30,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(
+                          top: 17,
+                          right: 10,
+                          left: 16,
+                        ),
+                        width: 260,
+                        child: TextFormField(
+                          controller: _textEditingController,
+                          maxLines: 1,
+                          cursorColor: Colors.black,
+                          keyboardType: TextInputType.visiblePassword,
+                          onChanged: (value) => searchPlacesInNepal(),
+                          decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xFFFFFFFF),
+                            prefixIcon: Icon(
+                              Icons.search_rounded,
+                              size: 28,
+                              color: Color(0xFF222222),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xFFFFFFFF),
+                                width: 2,
+                                style: BorderStyle.solid,
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(9),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xFFFFFFFF),
+                                width: 2,
+                                style: BorderStyle.solid,
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(9),
+                              ),
+                            ),
+                            hintText: 'Search Meeting Location',
+                            hintStyle: TextStyle(
+                              height: 0.9,
+                              fontFamily: "Mulish",
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF222222),
+                              fontSize: 16,
+                            ),
+                            suffixIconColor: Color.fromARGB(255, 255, 0, 0),
+                          ),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Mulish",
+                            fontWeight: FontWeight.w600,
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Leaving field cannot be empty';
+                            } else if (_places.isEmpty) {
+                              return 'No matching places found';
+                            }
+                            return null;
+                          },
+                          onEditingComplete: () {
+                            Get.to(
+                              () => VehicleHome(
+                                going: _goingController.text,
+                                location: _textEditingController.text,
+                                leaving: _leavingController.text,
+                                userId: '',
+                              ),
+                            )!
+                                .then((result) {
+                              if (result[0]["backValue"] == "one") {
+                                print("Result is coming");
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(right: 0),
+                        child: TextButton(
+                          onPressed: () {
+                            _textEditingController.text = '';
+                          },
+                          child: const Text(
+                            "Cancel",
+                            style: TextStyle(
+                              height: 2.96,
+                              fontFamily: "Mulish",
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFFFFFF),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _places.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final place = _places[index];
+                  return ListTile(
+                    title: Text(place),
+                    onTap: () {
+                      _textEditingController.text = place;
+                      setState(() => _places.clear());
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
